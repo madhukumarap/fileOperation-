@@ -1,16 +1,18 @@
-const mysqli = require("mysqli");
+const mysql = require('mysql2');
 
-const db = mysqli.createConnection({
-    host: process.env.DB_HOST || "localhost",
-    user: process.env.DB_USER || "root",
-    password: process.env.DB_PASSWORD || "",
-    database: process.env.DB_NAME || "filemanager",
-})
-db.connect((err) =>{
-    if(err){
-        console.log("Error while connecting the database",err);
-    }else{
-        console.log(" Database Connected Successfully");
-    }
-})
-module.exports = db;
+const connection = mysql.createConnection({
+  host: 'localhost',
+  user: 'root',
+  password: '1234',
+  database: 'file_manager'
+});
+
+connection.connect(err => {
+  if (err) {
+    console.error('Database connection failed:', err);
+    return;
+  }
+  console.log('Connected to MySQL');
+});
+
+module.exports = connection;

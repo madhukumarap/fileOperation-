@@ -70,10 +70,27 @@ const idGetter = getter(DATA_ITEM_KEY);
 
 const App = () => {
   const intl = useInternationalization();
-
-  const [stateData, setStateData] = React.useState<DataModel[]>(formatData(serverData, intl));
+  
+  const [stateData, setStateData] = React.useState<DataModel[]>([]);
   const [panes, setPanes] = React.useState<PanesModel[]>(splitterPanes);
-
+  const fetchFiles = async () => {
+    try {
+      const response = await fetch('http://localhost:5000/api/files');
+      if (!response.ok) {
+        throw new Error('Failed to fetch files');
+      }
+      const data = await response.json();
+      console.log(data)
+      const formattedData = formatData(data, intl);
+      setStateData(formattedData); 
+    } catch (error) {
+      console.error(error);
+    }
+  };
+  
+  React.useEffect(() => {
+    fetchFiles();
+  }, []);
   const [selectedGridItem, setSelectedGridItem] = React.useState<DataModel>({});
   const [selectedTreeItem, setSelectedTreeItem] = React.useState<DataModel | null>(null);
   const [gridSelection, setGridSelection] = React.useState<{ [id: string]: boolean | number[]; }>({});
@@ -185,16 +202,19 @@ const App = () => {
 
   const handleNewFolderClick = (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
     let newData;
+    console.log(newData, "newFolder")
     if (selectedTreeItem) {
       newData = addFolder(stateData, selectedTreeItem, intl);
+      console.log(newData, "newFolder")
       const newTreeItem = searchTreeItem(newData, selectedTreeItem);
+      console.log(newTreeItem,"newTreeItem")
       setSelectedTreeItem(newTreeItem);
     } else {
       newData = addFolder(stateData, null, intl);
     }
     setStateData(newData);
   };
-
+  console.log(stateData, "stateData")
   const handleSearchChange = (event: InputChangeEvent) => {
     let eventPath = '';
     if (selectedTreeItem?.items) {
